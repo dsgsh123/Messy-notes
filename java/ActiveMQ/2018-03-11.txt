@@ -1,0 +1,1 @@
+1. ActiveMQ默认是队列模式，当要实现订阅topic时，需要进行相关配置修改为topic模式，否则无法监听topic

@@ -1,0 +1,18 @@
+ server {
+        listen       80;
+        server_name  localhost;
+        location / {
+            root   html;
+            index  index.html index.htm;
+        }
+        location /image/ {
+            root   /myImage/;
+            autoindex on;
+        }
+
+    }
+
+1. 如上所示，ngnix在配置location的时候，使用的是最大匹配原则，即当出现location /image/与location /image/a/两个location配置的时候，根据请求url优先匹配location /image/a/
+
+2. 如上所示（也可以使用绝对路径），在发出localhost:8080/image/a.jpg的请求时，实际上映射的资源位置是ngnix.exe所在目录下的myImage目录下的image目录下的a.jpg（不是把image映射成myImage，
+而是在myImage后面再拼上/image，这个我之前理解错了）
