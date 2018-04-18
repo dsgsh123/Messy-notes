@@ -45,3 +45,26 @@ Child.prototype.getGrade = function () {
 	而同理 Parent.prototype.constructor指向Parent函数本身，所以此时的最终
 	指向为 Child.prototype.constructor = Parent,
 	所以最终要使用Child.prototype.constructor = Child来修正他的指向。
+	
+
+目前根据ES6标准，加入了class继承用法，不需要再自己像上面一样进行定义了：
+class Parent {
+    constructor(name) {
+        this.name = name;
+    }
+    hello() {
+        alert('Hello, ' + this.name + '!');
+    }
+}
+
+class Child extends Parent {
+    constructor(name, age) {
+        super(name); // 记得用super调用父类的构造方法!
+        this.age = age;
+    }
+    myAge() {
+        alert('I am  ' + this.age + 'years old');
+    }
+}
+
+class自动实现了如上原型链的设置，此时获得了父类的hello方法和自定义的myAge方法
