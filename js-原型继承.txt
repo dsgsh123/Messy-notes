@@ -1,0 +1,47 @@
+function inherits(Child, Parent) {
+    var F = function () {};
+    F.prototype = Parent.prototype;
+    Child.prototype = new F();
+    Child.prototype.constructor = Child;
+}
+function Parent(props) {
+    this.name = props.name || 'Unnamed';
+}
+Parent.prototype.hello = function () {
+    alert('Hello, ' + this.name + '!');
+}
+function Child(props) {
+    Parent.call(this, props);
+    this.grade = props.grade || 1;
+}
+// 实现原型继承链:
+inherits(PrimaryStudent, Student);
+// 绑定其他方法到PrimaryStudent原型:
+Child.prototype.getGrade = function () {
+    return this.grade;
+};
+
+1.为什么原型继承要创建空F函数，而不用 Child.prototype = new Parent();
+	当使用Child.prototype = new Parent()的时候，所用通过new Child()创建的对象child的原型都指向了同一个Parent()的实例对象，即
+	child --->Child.prototype --->new Parent() ---->Parent.prototype ---->Object.prototype ----->null
+	假设function Parent(){
+		this.name = name;
+	}
+	那么由于所有创建的child实例对象的原型都指向了同一个parent对象，那么就会使得所有的child都继承共用了同一个name，这显然是不合适的。
+	而使用空函数F()之后，其原型链如下所示：
+	child --->Child.prototype --->new F() ---->F.prototype === Parent.prototype --->Object.prototype ---> null
+	此时，由于new F()实例对象中的属性为空，所以创建的child没有从new F()中获取共用属性（除非在Parent.prototype中定义了属性，但除非脑子有病才会这么做，哈哈哈【类变量除外】），
+	但是由于此时new F()对象的原型指向的就是Parent.prototype,所以new F()会继承在Parent.prototype中定义的函数，Child.prototype又会从new F()这个对象中获取到继承的函数，所有child实例
+	对象都会继承Child.prototype的函数，也就继承了来自Parent.prototype中定义的函数，并且由于name属性是定义在Parent函数中而不是Parent.prototype中，F()中没有name，所以并不会存在
+	所有child对象共用一个name的情况，通过Parent.call(this, props)只是简单的函数调用，在函数调用中给每个child对象分别赋予了属于自身this的name属性,这是不会共享的。
+2.为什么要使用 Child.prototype.constructor = Child？
+	因为我们知道child对象 new Child().constructor = Child.prototype.constructor的，
+	Child.prototype.constructor又指向Child函数本身，这才是正常指向状态，而在上面的
+	Child.prototype = new F()修改了child对象原型的指向，
+	所以此时的 new Child().constructor = new F().constructor，
+	而同理又存在new F().constructor = F.prototype.constructor,
+	而又有F.prototype = Parent.prototype,
+	所以又有new Child().constructor = Parent.prototype.constructor，
+	而同理 Parent.prototype.constructor指向Parent函数本身，所以此时的最终
+	指向为 Child.prototype.constructor = Parent,
+	所以最终要使用Child.prototype.constructor = Child来修正他的指向。
