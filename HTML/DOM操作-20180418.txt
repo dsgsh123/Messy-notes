@@ -12,3 +12,14 @@ var
 list.appendChild(js);
 
 使用原生方法进行操作时，会把id=js的节点添加为id=list的节点的最后一个子节点，!->并删除原来的节点<-！
+
+删除节点：
+	// 拿到待删除节点:
+	var self = document.getElementById('to-be-removed');
+	// 拿到父节点:
+	var parent = self.parentElement;
+	// 删除:
+	var removed = parent.removeChild(self);
+	removed === self; // true
+	
+	删除后的节点虽然不在文档树中了，但其实它还在内存中，可以随时再次被添加到别的位置。（self保存着被删除节点，可以再次进行添加回去的操作）
