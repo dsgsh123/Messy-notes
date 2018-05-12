@@ -1,0 +1,62 @@
+public class Test {
+
+	 static String ss(){
+		return "f";
+	}
+	 
+	 String aa(){
+			return "fa";
+		}
+
+	public static void main(String[] args) {
+		Test aTest = new Test_1();
+		System.out.println(aTest.ss()+"  "+ aTest.aa());
+	}
+
+}
+class Test_1 extends Test{
+	 static String ss(){
+		return "c";
+	}
+	String aa(){
+		return "sa";
+	}
+	String aa(String ){
+		return "saa";
+	}
+}
+
+1. 此时由于ss()是静态方法,所以JVM会先到常量池中对应的常量表中找到该方法，并获取该方法的所在类Test，之后获取到Test所在方法区中ss()方法的直接引用地址，并记录到常量表中的对应位置，之后调用的时候就可以直接获取到指向Test的ss()方法的地址。（使用的是invokestatic指令），所以调用的是父类静态方法，而不是子类的
+
+2. aa()是实例方法，但与（1）中不同的是，此时常量表中存的是aa()方法在Test的方法表中的索引位置，而非直接地址，当进行实际调用时，会根据该索引位置找到子类Test_1方法表中对应位置的方法，然后调用，所以实际调用的是子类里的实例方法，而不是父类的。（使用的是invokevirtual指令）
+
+3. 父类有实例方法String aa()，子类不可以有static String aa()
+
+4. 实例方法，编译看左，执行看右，例如父类中没有aa(String s)，当使用aTest.aa("s")时，编译无法通过，因为JVM在Test的方法表中找不到aa(String s)
+
+
+public class Test {
+	
+	static int i = 1;
+	int k = 1;
+	String ss(int c){
+		return "f";
+	}
+	public static void main(String[] args) {
+		Test aTest = new Test_1();
+		char s = 'k';
+		System.out.println(aTest.ss(s)+" "+aTest.i + " " + aTest.k);
+	}
+
+}
+class Test_1 extends Test{
+	static int i = 2;
+	int k  = 2;
+	String ss(char c){
+		return "c";
+	}
+}
+
+5. 此时打印的是 f，而不是c，我的理解是，在编译阶段，在Test的方法表中寻找ss(char c)找不到的时候，会自动进行转型匹配，因此找到了ss(int i)，在常量表中记录了它所在的索引位置（例如是11），而在Test_1的方法表中，也存在了一个从父类继承的ss(int i )，其在方法表中的索引位置也是11，同时其自身又有一个ss(char c)，索引位置是12，由于常量表中记录的是11索引，所以在运行的时候，会取子类的方法表中的11索引的方法，即执行ss(int i),而不是执行ss(char c)
+
+6. i和k的值打印的都是1,而不是2
