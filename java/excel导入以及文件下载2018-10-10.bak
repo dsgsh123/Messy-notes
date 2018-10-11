@@ -1,0 +1,25 @@
+1. ajax不能接收返回的下载文件，及无法使用ajax的方式来进行文件下载，可以使用a标签的href属性等进行下载
+
+2. java使用excel导入的时候，一般使用poi包，不使用jxls包，因为jxls不兼容2003以上的版本（xlsx）
+
+3. MyBatis传入参数类型可以是Java基础数据类型，但是只适用于一个参数的情况
+
+4. insert使用values的形式不可以设置过滤条件，使用insert into table（x,y,z） select 'x具体值','y具体值','z具体值' from dual where exists ()的形式可以进行过滤，其中dual是临时表，不需要物理创建，下面是使用mybatis进行有条件批量插入的示例：
+
+	
+	<!-- 使用dual临时表实现批量插入时的判断条件 -->
+	<insert id="addDrugs" parameterType="java.util.ArrayList">
+		INSERT INTO drug
+		(drugid,drugname,specification,category,drugcode, company,
+		purchaseprice,salesprice,clinicid,supplier,txm)
+		<foreach collection="list" item="item" index="index"
+			separator="union all">
+			(SELECT
+				#{item.drugid},#{item.drugname},#{item.specification},#{item.category},#{item.drugcode},#{item.company},
+				#{item.purchaseprice},#{item.salesprice},#{item.clinicid},#{item.supplier},#{item.txm}
+				FROM DUAL WHERE EXISTS
+								(SELECT suppliename FROM clinic_supplier WHERE suppliename = #{item.supplier})
+								AND NOT EXISTS(SELECT  drugname FROM drug where drugname= #{item.drugname} and specification=#{item.specification} and category=#{item.category})
+			)	
+		</foreach>
+	</insert>
