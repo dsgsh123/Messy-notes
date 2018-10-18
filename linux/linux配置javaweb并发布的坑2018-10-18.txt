@@ -1,0 +1,18 @@
+1. 最好先将centos自带的jdk卸载，并使用官方下载包的方式重新安装，不建议只用yum进行下载，因为可能会出现缺失包的错误
+
+2. 安装mysql的时候，创建用户的时候（记录在mysql库的user表中），可以把localhost设置为 %，从而对所有远程访问可用。
+
+3. centos7中需要使用firewall的方式开启端口使用，这样外部才能访问如 3306  8080等端口
+
+4. 使用自己的用户登录mysql的时候，可能会出现 ：
+ERROR 1045 (28000): Access denied for user 'xxx'@'localhost' (using password: YES)
+的错误，但user表明明host是% 并且密码没错，这是因为表中存在user字段为空的用户，其host为localhost，这样由于mysql 的匹配规则为匹配最特定的主机值的那条记录，因此例如使用test用户本机登录mysql的时候，
+实际上匹配到的用户为 @localhost 而不是 test@localhost，这点要非常注意，StackOverflow推荐将user为空的用户删除，并且一定要使用flush privileges来更新权限（必须要执行这个命令），参考博客：
+https://www.cnblogs.com/summertime-wu/p/7466160.html
+
+5. mysql在linux中是默认区分大小写的，而在windows中是不区分的，因此在项目中使用框架或者如果没有对实体类和数据库中的表名进行完全匹配的处理（如使用注解），那么在部署到linux上时，就会出现找不到表的错误，解决办法有两种：
+ （1）在项目中进行完全的匹配（一般可以使用注解，其实这也是我们应该保证的）
+ （2）在linux中找到my.cnf文件，一般存在于 /etc/my.cnf目录下，使用vim命令在该文件的[mysqld]标签下第一行添加  lower_case_table_names=1  来开启不区分大小写
+
+
+6. war发布到tomcat中后，要注意在tomcat中配置对应项目的静态资源的地址，不然会出现静态资源无法加载的情况
