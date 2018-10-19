@@ -15,5 +15,11 @@ https://www.cnblogs.com/summertime-wu/p/7466160.html
  （2）在linux中找到my.cnf文件，一般存在于 /etc/my.cnf目录下，使用vim命令在该文件的[mysqld]标签下第一行添加  lower_case_table_names=1  来开启不区分大小写
 
 
-6. war发布到tomcat中后，要注意在tomcat中配置对应项目的静态资源的地址，不然会出现静态资源无法加载的情况,建议在项目中统一使用相对路径而不要使用绝对路径
-如  /static/xxx.js（绝对） 变为 static/xxx.js（相对）
+6.（1） war发布到tomcat中后，要注意在tomcat中配置对应项目的静态资源的地址，不然会出现静态资源无法加载的情况,建议在项目中统一使用相对路径而不要使用绝对路径如  /static/xxx.js（绝对） 变为 static/xxx.js（相对）,如果静态资源已经是绝对路径了，那么可以在tomcat中进行配置，如：
+        <Context path="/static" docBase="部署项目名/static" reloadable="true" crossContext="true" /> 
+ （2）！！注意项目名前没有“/”，是使用了相对路径，相对于tomcat的host的appBase而言的，path为虚拟路径，及输入 localhost:8080/static实际访问的地址是localhost:8080/部署项目名/static
+ （3）项目中如a.jsp中js的引用路径（绝对）为  /static/xx.js的话，访问的时候，通过F12的netword可以看到访问的是localhost:8080/static/xx.js，这样显然路径是错的，就会访问不到资源，此时有两种情况，如果tomcat没有像（1）（2）中配置context的话，那么可以把路径改为相对路径（相对于当前资源的位置）static/xx.js，这样再看就会发现路径变为localhost:8080/部署项目名/static/xx.js，路径正确，可以正常访问，第二种情况是仍然使用绝对路径，不过tomcat配置了如         （1）所示的context，这样本来应该是localshot:8080/static/xx.js，由于context的存在，/static被映射成了 /部署项目名/static，自然地址就从
+       localhost:8080/static/xx.js变成了 localhost:8080/部署项目名/static/xx.js，路径正确，可以正常访问。
+ （4）部署项目名即为你放在webapps目录下的war包所解压出来的文件夹的名字，war包会自动解压成同名文件夹，里面放着你的项目内容，
+ 
+
