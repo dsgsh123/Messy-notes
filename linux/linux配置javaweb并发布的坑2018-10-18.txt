@@ -15,4 +15,5 @@ https://www.cnblogs.com/summertime-wu/p/7466160.html
  （2）在linux中找到my.cnf文件，一般存在于 /etc/my.cnf目录下，使用vim命令在该文件的[mysqld]标签下第一行添加  lower_case_table_names=1  来开启不区分大小写
 
 
-6. war发布到tomcat中后，要注意在tomcat中配置对应项目的静态资源的地址，不然会出现静态资源无法加载的情况
+6. war发布到tomcat中后，要注意在tomcat中配置对应项目的静态资源的地址，不然会出现静态资源无法加载的情况,建议在项目中统一使用相对路径而不要使用绝对路径
+如  /static/xxx.js（绝对） 变为 static/xxx.js（相对）
