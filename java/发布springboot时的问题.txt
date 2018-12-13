@@ -1,0 +1,18 @@
+1. 发布到tomcat中时quertz不执行，需要去掉热部署才会执行，这是为什么？
+
+2. windows本地部署商品中心，发送httpget请求中英文都可以，部署到linux上后，发送httpget参数为英文可以，为中文就会报400错误，这是为什么------》》tomcat新版本不允许url参数中带有中文，要先进行URL编码，tomcat会自动进行解码，tomcat8之前默认使用ISO8859-1，之后默认使用utf-8,可以手动配置为UTF-8
+
+3. 方式tomcat加载项目多次，要么去掉配置的context，要么去掉host中的appBase（删掉这个字段，而不是设置成appBase=""）
+
+4. 发布到tomcat中需要把websocket的配置bean去掉，因为tomcat8已经支持websocket，需要将websocket的控制权交给tomcat，如果有bean，控制权在spring中（网上得知，自己并不知道这个说法是不是对的），因此启动会报错。
+
+5. windows中的路径分隔符与linux不一致，涉及到如文件下载的时候需要注意一下
+
+6. 把springboot打包成war部署到外部tomcat中时（springboot自带tomcat），需要使用<scope>provided</scope>把spring-boot-starter-tomcat打包时排除，同时启动类要继承 SpringBootServletInitializer
+
+  #配置热部署生效或者关闭
+  devtools:
+    restart:
+      enabled: false
+
+7.发布到tomcat的时候老是提示存在重复的@RequestMapping，无法启动，看了代码并不存在重复的requestmapping，本地启动也没有问题，后来发现，maven打的war包里存在了明明早就删掉的类的class文件，这个文件与现在的class文件中存在了重复requestMapping，clean了项目也没有用，暂时没找到原因是什么。
